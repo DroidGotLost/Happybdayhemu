@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>happy birthday cutu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <!-- 1. INCLUDE TWEMOJI LIBRARY (Locks emoji appearance) -->
+    <script src="https://unpkg.com/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        /* --- CSS RESET & BASICS --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 2. TWEMOJI STYLE (Ensures locked emojis fit perfectly) */
+        img.emoji {
+            height: 1em;
+            width: 1em;
+            margin: 0 .05em 0 .1em;
+            vertical-align: -0.1em;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #ffdee9;
+            background-image: 
+                radial-gradient(#ff4d6d 1px, transparent 1px),
+                linear-gradient(#fcddec 1px, transparent 1px);
+            background-size: 30px 30px;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* --- 1. LIGHTS OFF OVERLAY --- */
+        #lights-off-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000;
+            z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        #turn-on-btn {
+            background: transparent; color: #fff;
+            font-family: 'Press Start 2P', cursive; font-size: 1.2rem;
+            padding: 20px 40px; border: 2px solid #fff; border-radius: 50px;
+            cursor: pointer; box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease; animation: pulse 2s infinite;
+            display: flex; align-items: center; gap: 10px;
+        }
+        #turn-on-btn:hover { background: #fff; color: #000; box-shadow: 0 0 25px rgba(255, 255, 255, 0.8); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); } 70% { box-shadow: 0 0 0 20px rgba(255,255,255,0); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } }
+        .fade-out { opacity: 0; pointer-events: none; }
+
+        /* --- 2. MAIN CONTENT AREA --- */
+        #main-content {
+            width: 100%; height: 100%; position: relative;
+            opacity: 0; transition: opacity 2s ease-in, filter 0.5s ease;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center;
+        }
+        
+        .blur-background { filter: blur(8px); pointer-events: none; }
+
+        /* BACKGROUND DECORATIONS */
+        #decorations { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+        
+        .balloon {
+            position: absolute; width: 50px; height: 65px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1);
+            transition: top 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .balloon::before { content: ''; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 1px; height: 25px; background: rgba(0,0,0,0.3); }
+        .shape { position: absolute; opacity: 0.7; animation: float 8s ease-in-out infinite; }
+        .shape-circle { width: 20px; height: 20px; border-radius: 50%; }
+        .shape-star { font-size: 1.5rem; color: #ffd32a; }
+        .shape-emoji { font-size: 2.5rem; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1)); }
+        
+        @keyframes float { 0% { transform: translateY(0) rotate(-8deg); } 50% { transform: translateY(-30px) rotate(8deg); } 100% { transform: translateY(0) rotate(-8deg); } }
+
+        /* Bunting Flags */
+        .bunting-container { 
+            position: absolute; 
+            top: 0; 
+            left: 0; width: 100%; display: flex; justify-content: center; overflow: hidden; z-index: 10; height: 60px;
+            opacity: 0;
+            transform: translateY(-150vh);
+        }
+        .flag { width: 0; height: 0; border-left: 25px solid transparent; border-right: 25px solid transparent; border-top: 50px solid; margin: 0 5px; filter: drop-shadow(0px 4px 2px rgba(0,0,0,0.1)); transform-origin: top center; animation: sway 3s ease-in-out infinite alternate; }
+        .flag:nth-child(3n+1) { border-top-color: #ff4757; animation-delay: 0s; }
+        .flag:nth-child(3n+2) { border-top-color: #ff6b81; animation-delay: 0.5s; }
+        .flag:nth-child(3n+3) { border-top-color: #ffbed1; animation-delay: 1s; }
+        @keyframes sway { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+
+        /* Layout */
+        .layout-container { 
+            display: flex; flex-direction: row; justify-content: center; align-items: center; 
+            width: 90%; max-width: 1200px; height: auto; gap: 50px; position: relative; z-index: 5; 
+        }
+
+        /* --- ANIMATED SECTIONS --- */
+        
+        .text-section { 
+            flex: 1; text-align: left; z-index: 5; 
+            opacity: 0;
+            transform: translateY(-150vh);
+        }
+
+        .image-section { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative;
+            opacity: 0;
+            transform: translateY(150vh);
+        }
+
+        /* --- NAME TAG STYLE --- */
+        .name-tag {
+            position: absolute;
+            bottom: -25px; /* Overlaps bottom border perfectly */
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff4757;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            box-shadow: none; 
+            border: 3px solid #2f3542;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            white-space: nowrap;
+            z-index: 25; 
+        }
+
+        /* --- CUSTOM BOUNCE KEYFRAMES --- */
+        @keyframes bounceInUp {
+            0% { opacity: 0; transform: translateY(150vh); }
+            60% { opacity: 1; transform: translateY(-30px); } 
+            80% { transform: translateY(10px); } 
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes bounceInDown {
+            0% { opacity: 0; transform: translateY(-150vh); }
+            60% { opacity: 1; transform: translateY(30px); }
+            80% { transform: translateY(-10px); }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .animate-up { animation: bounceInUp 1.8s ease-out forwards; }
+        .animate-down { animation: bounceInDown 1.8s ease-out forwards; }
+
+        h1 { font-size: 3rem; line-height: 1.4; color: #ff4757; text-shadow: 4px 4px 0px #2f3542; margin-bottom: 15px; animation: floatText 3s ease-in-out infinite; }
+        @keyframes floatText { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .date-tag { font-size: 1rem; color: #57606f; margin-bottom: 40px; display: inline-block; background: rgba(255,255,255,0.5); padding: 10px; border-radius: 8px; }
+        
+        .button-group { display: flex; gap: 20px; }
+        .action-btn { font-family: 'Press Start 2P', cursive; font-size: 0.9rem; padding: 15px 25px; border: 3px solid #2f3542; border-radius: 12px; cursor: pointer; box-shadow: 6px 6px 0px #2f3542; transition: all 0.1s; text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+        .action-btn:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0px #2f3542; }
+        .btn-letter { background-color: #ff6b81; color: white; }
+        .btn-cake { background-color: #ff4757; color: white; }
+
+        .photo-frame { 
+            width: 350px; height: 350px; 
+            background-color: #fff0f3; 
+            border-radius: 50%; 
+            border: 5px solid #fff; 
+            outline: none; 
+            box-shadow: 
+                0 0 0 8px #ffb7c5,
+                0 0 0 15px #ffe0eb,
+                0 0 0 16px #ff8fa3,
+                0 15px 25px rgba(0,0,0,0.15); 
+            position: relative; 
+            display: flex; justify-content: center; align-items: center; 
+            overflow: visible; 
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .frame-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; border-radius: 50%; overflow: hidden; font-size: 100px; }
+        .frame-content img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* 3D CROWN (Image based for PC Look) */
+        .crown {
+            position: absolute;
+            top: -65px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-10deg);
+            width: 80px; /* Explicit width for image */
+            z-index: 20;
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.2));
+            animation: hatBounce 2s infinite;
+        }
+
+        @keyframes hatBounce {
+            0%, 100% { transform: translateX(-50%) rotate(-10deg) translateY(0); }
+            50% { transform: translateX(-50%) rotate(-10deg) translateY(-10px); }
+        }
+
+        /* --- 3. MODAL (Letter) --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+        .letter-box { 
+            background: #fff; 
+            padding: 40px; 
+            width: 90%; 
+            max-width: 500px; 
+            border: 4px solid #2f3542; 
+            box-shadow: 15px 15px 0px #ff4757; 
+            text-align: center; 
+            line-height: 1.8; 
+            position: relative; 
+            animation: softEntrance 0.8s ease-out;
+            border-radius: 25px; 
+        }
+        
+        .letter-decoration { position: absolute; font-size: 2rem; animation: float 4s ease-in-out infinite; }
+        
+        @keyframes softEntrance { from { transform: translateY(30px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        .letter-box h2 { color: #ff4757; margin-bottom: 20px; font-size: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .letter-box p { font-family: 'Arial', sans-serif; font-size: 1.1rem; color: #333; margin-bottom: 15px; }
+        .close-btn { 
+            margin-top: 20px; 
+            background: #2f3542; 
+            color: #fff; 
+            padding: 10px 25px; 
+            border: none; 
+            cursor: pointer; 
+            font-family: 'Press Start 2P', cursive; 
+            transition: background 0.2s;
+            border-radius: 15px;
+        }
+        .close-btn:hover { background: #57606f; }
+
+        /* --- 5. BIG CAKE OVERLAY --- */
+        #cake-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10001; justify-content: center; align-items: center; flex-direction: column; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .cake-container { position: relative; display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.2)); transition: transform 0.3s; }
+        
+        .layer { 
+            border: none; 
+            border-radius: 15px; 
+            position: relative; 
+            box-shadow: 
+                inset 5px 0 15px rgba(255,255,255,0.6), 
+                inset -10px 0 20px rgba(0,0,0,0.15), 
+                0 10px 20px rgba(0,0,0,0.2); 
+        }
+        
+        .layer::after { 
+            content: ''; 
+            position: absolute; 
+            top: -5px; left: 5px; right: 5px; 
+            height: 20px; 
+            background: #ffe0eb; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+        
+        .layer-bottom { width: 320px; height: 110px; background: linear-gradient(135deg, #ff6b81, #ff4757); z-index: 1; }
+        .layer-middle { width: 240px; height: 90px; background: linear-gradient(135deg, #ff8fa3, #ff6b81); z-index: 2; margin-bottom: -15px; }
+        .layer-top { width: 160px; height: 70px; background: linear-gradient(135deg, #ffc2e0, #ff9ff3); z-index: 3; margin-bottom: -15px; }
+        
+        .decoration { position: absolute; background: #fff; border-radius: 50%; box-shadow: 1px 1px 4px rgba(0,0,0,0.2); }
+        .dec-1 { width: 12px; height: 12px; top: 30%; left: 20%; background: #ffd32a; }
+        .dec-2 { width: 12px; height: 12px; top: 60%; left: 70%; background: #2ed573; }
+        .dec-3 { width: 14px; height: 14px; top: 40%; left: 50%; background: #1e90ff; }
+        
+        .candles-container { display: flex; justify-content: center; gap: 20px; z-index: 4; margin-bottom: -15px; }
+        .candle { width: 18px; height: 50px; background: repeating-linear-gradient(45deg, #ffd32a, #ffd32a 8px, #fff 8px, #fff 16px); border-radius: 6px; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); position: relative; }
+        .flame { width: 14px; height: 30px; background: radial-gradient(ellipse at center, #fff 10%, #ffca3a 40%, #ff4757 100%); border-radius: 50% 50% 35% 35%; position: absolute; top: -35px; left: 50%; transform: translateX(-50%); box-shadow: 0 0 20px #ffca3a, 0 0 40px #ff4757; animation: flicker 0.1s infinite alternate; transform-origin: center bottom; }
+        
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1); opacity: 1; }
+            100% { transform: translateX(-50%) scale(1.1) rotate(2deg); opacity: 0.8; }
+        }
+        
+        #finish-cake-btn { margin-top: 40px; padding: 15px 30px; font-size: 1rem; background: #2ed573; color: #fff; border: 4px solid #2f3542; border-radius: 50px; cursor: pointer; font-family: 'Press Start 2P', cursive; box-shadow: 0 5px 0 #2f3542; transition: all 0.1s; }
+        #finish-cake-btn:active { transform: translateY(5px); box-shadow: 0 0 0 #2f3542; }
+        .confetti { position: absolute; width: 12px; height: 12px; z-index: 99; animation: fall linear forwards; }
+        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+        .footer { position: absolute; bottom: 20px; right: 30px; font-size: 0.7rem; color: #ff4757; opacity: 0.7; }
+        
+        /* Media Queries */
+        @media (max-width: 1024px) { h1 { font-size: 2.5rem; } .photo-frame { width: 300px; height: 300px; } }
+        @media (max-width: 900px) { .layout-container { flex-direction: column-reverse; text-align: center; gap: 30px; width: 95%; } .text-section { margin-top: 0; padding: 0 10px; display: flex; flex-direction: column; align-items: center; } h1 { font-size: 1.8rem; margin-bottom: 10px; } .date-tag { margin-bottom: 25px; font-size: 0.8rem; } .photo-frame { width: 220px; height: 220px; box-shadow: 0 0 0 5px #ffb7c5, 0 0 0 10px #ffe0eb, 0 0 0 11px #ff8fa3, 0 10px 20px rgba(0,0,0,0.15); } 
+        .crown { width: 60px; top: -50px; }
+        .name-tag { bottom: -18px; font-size: 0.75rem; padding: 8px 15px; } /* Mobile adjustment */
+        .button-group { flex-direction: row; gap: 10px; width: 100%; justify-content: center; } .action-btn { padding: 12px 15px; font-size: 0.7rem; width: auto; } .balloon { transform: scale(0.7); } .balloon:nth-child(even), .shape:nth-child(odd) { display: none; } .cake-container { transform: scale(0.7); } .letter-box { padding: 25px; width: 85%; } .letter-box h2 { font-size: 1.2rem; } .letter-box p { font-size: 0.9rem; } #turn-on-btn { font-size: 0.9rem; padding: 15px 25px; } }
+        @media (max-width: 400px) { .button-group { flex-direction: column; width: 80%; } .action-btn { width: 100%; } .photo-frame { width: 180px; height: 180px; } h1 { font-size: 1.5rem; } .cake-container { transform: scale(0.6); } }
+        @media (max-height: 500px) { .layout-container { flex-direction: row; gap: 20px; } .photo-frame { width: 150px; height: 150px; } h1 { font-size: 1.5rem; } .date-tag { margin-bottom: 10px; } .crown { width: 50px; top: -40px; } .cake-container { transform: scale(0.5); } }
+
+    </style>
+</head>
+<body>
+
+    <!-- BACKGROUND AUDIO (Added raw link) -->
+    <audio id="bgMusic" loop>
+        <source src="https://raw.githubusercontent.com/DroidGotLost/bdayyyyyypaawrryyy/main/until_i_found_her_music.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 1. Lights Off Overlay -->
+    <div id="lights-off-overlay">
+        <button id="turn-on-btn">Turn lights on</button>
+    </div>
+
+    <!-- 2. Main Birthday Content -->
+    <div id="main-content">
+        <!-- Decoration: Flags -->
+        <div class="bunting-container" id="bunting">
+            <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+            <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+            <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+            <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+            <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+            <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+            <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        </div>
+
+        <!-- Background Decorations -->
+        <div id="decorations">
+            <div class="balloon" data-top="20%" style="top: 110vh; left: 8%; background-color: #ff4757; animation-delay: 0s;"></div>
+            <div class="balloon" data-top="25%" style="top: 110vh; left: 88%; background-color: #2ed573; animation-delay: 1.5s;"></div>
+            <div class="balloon" data-top="55%" style="top: 110vh; left: 4%; background-color: #1e90ff; animation-delay: 2.5s; transform: scale(0.8);"></div>
+            <div class="balloon" data-top="45%" style="top: 110vh; left: 92%; background-color: #ffa502; animation-delay: 1s;"></div>
+            <div class="balloon" data-top="10%" style="top: 110vh; left: 45%; background-color: #ff6b81; animation-delay: 2s; transform: scale(0.9);"></div>
+            <div class="balloon" data-top="65%" style="top: 110vh; left: 15%; background-color: #7bed9f; animation-delay: 3s; transform: scale(0.85);"></div>
+            <div class="balloon" data-top="75%" style="top: 110vh; left: 82%; background-color: #70a1ff; animation-delay: 0.5s; transform: scale(0.9);"></div>
+            
+            <div class="shape shape-circle" style="top: 15%; left: 22%; background: #ff6b81; animation-duration: 7s;"></div>
+            <div class="shape shape-circle" style="top: 75%; left: 85%; background: #1e90ff; animation-duration: 9s;"></div>
+            <div class="shape shape-circle" style="top: 85%; left: 35%; background: #ffa502; animation-duration: 6s;"></div>
+            <div class="shape shape-star" style="top: 40%; left: 15%; animation-delay: 0.5s;">⭐</div>
+            <div class="shape shape-star" style="top: 20%; left: 78%; color: #ff4757; animation-delay: 2s;">⭐</div>
+            <div class="shape shape-star" style="top: 85%; left: 12%; color: #ffa502; animation-delay: 1s;">⭐</div>
+            <div class="shape shape-star" style="top: 65%; left: 88%; color: #2ed573; font-size: 1.5rem; animation-delay: 3s;">⭐</div>
+            <div class="shape shape-star" style="top: 10%; left: 10%; color: #ff9ff3; font-size: 1.2rem; animation-delay: 1.5s;">⭐</div>
+            <div class="shape shape-emoji" style="top: 30%; left: 90%; animation-delay: 2s;">🎁</div>
+            <div class="shape shape-emoji" style="top: 12%; left: 60%; animation-delay: 4s; font-size: 2rem;">🎉</div>
+            <div class="shape shape-emoji" style="top: 80%; left: 25%; animation-delay: 1s; font-size: 2rem;">💖</div>
+            <div class="shape shape-emoji" style="top: 50%; left: 5%; animation-delay: 3s;">🍰</div>
+            <div class="shape shape-emoji" style="top: 90%; left: 55%; animation-delay: 0.5s; font-size: 1.5rem;">✨</div>
+            <div class="shape shape-emoji" style="top: 5%; left: 30%; animation-delay: 2.5s; font-size: 1.8rem;">🎈</div>
+        </div>
+
+        <div class="layout-container">
+            <!-- Text Section (Animation: Down) -->
+            <div class="text-section" id="textSection">
+                <h1>HAPPY<br>BIRTHDAY</h1>
+                <div class="date-tag">❤️ 3 January 2026</div>
+                <div class="button-group">
+                    <button class="action-btn btn-letter" id="openLetterBtn">📩 Read Letter</button>
+                    <button class="action-btn btn-cake" id="showCakeBtn">🎂 Bring Cake</button>
+                </div>
+            </div>
+
+            <!-- Image Section (Animation: Up) -->
+            <div class="image-section" id="imageSection">
+                <!-- Replaced text emoji with 3D Image for PC look -->
+                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Crown.png" class="crown" alt="Crown">
+                
+                <!-- PHOTO FRAME with NAME TAG INSIDE for relative positioning -->
+                <div class="photo-frame" id="photoFrame">
+                    <div class="frame-content" id="frameContent">
+                        <img src="https://raw.githubusercontent.com/DroidGotLost/bdayyyyyypaawrryyy/main/bbbafabf-a3eb-4df8-abad-d85ad6087d50.jpg" alt="Birthday Person" id="mainImage">
+                    </div>
+                    
+                    <!-- NAME TAG FIXED TO RING -->
+                    <div class="name-tag">
+                        Pratigya ji 💗🌷
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">from Nishant, with love ❤️</div>
+    </div>
+
+    <!-- 3. Hidden Letter Modal -->
+    <div class="modal-overlay" id="letterModal">
+        <div class="letter-box">
+            <!-- Decorative Elements for Letter -->
+            <div class="letter-decoration" style="top: -20px; left: -20px; transform: rotate(-20deg);">🎈</div>
+            <div class="letter-decoration" style="top: -20px; right: -20px; transform: rotate(20deg); animation-delay: 1s;">✨</div>
+            <div class="letter-decoration" style="bottom: -20px; left: -20px; transform: rotate(10deg); animation-delay: 2s;">🌟</div>
+            <div class="letter-decoration" style="bottom: -20px; right: -20px; transform: rotate(-10deg); animation-delay: 3s;">🎈</div>
+            <div class="letter-decoration" style="top: 50%; left: -35px; transform: translateY(-50%); animation-delay: 1.5s;">🎉</div>
+            <div class="letter-decoration" style="top: 50%; right: -35px; transform: translateY(-50%) scaleX(-1); animation-delay: 0.5s;">🎉</div>
+
+            <h2>Happy B'day 🌷</h2>
+            <p>I don’t know if you realize it, but you have this effortless way of making moments feel softer and smiles come easier.</p>
+            <p>I hope today surrounds you with warmth, laughter, and a little extra magic—because you truly deserve it.</p>
+            <p>And maybe it’s just me… but the world feels a bit brighter with you in it 🌷</p>
+            <p>Stay lovely, stay you ✨💫</p>
+            <button class="close-btn" id="closeLetterBtn">Close</button>
+        </div>
+    </div>
+
+    <!-- 4. BIG CAKE OVERLAY -->
+    <div id="cake-overlay">
+        <div class="cake-container">
+            <div class="candles-container">
+                <div class="candle"><div class="flame"></div></div>
+                <div class="candle"><div class="flame"></div></div>
+                <div class="candle"><div class="flame"></div></div>
+                <div class="candle"><div class="flame"></div></div>
+            </div>
+            <div class="layer layer-top">
+                <div class="decoration dec-1"></div>
+                <div class="decoration dec-2" style="top: 50%; left: 10%;"></div>
+            </div>
+            <div class="layer layer-middle">
+                <div class="decoration dec-3"></div>
+                <div class="decoration dec-1" style="top: 50%; left: 80%;"></div>
+            </div>
+            <div class="layer layer-bottom">
+                <div class="decoration dec-2"></div>
+                <div class="decoration dec-3" style="top: 20%; left: 30%;"></div>
+            </div>
+        </div>
+        <button id="finish-cake-btn">Eat and finish the cake 🍰</button>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT LOGIC ---
+        const turnOnBtn = document.getElementById('turn-on-btn');
+        const overlay = document.getElementById('lights-off-overlay');
+        const mainContent = document.getElementById('main-content');
+        const letterBtn = document.getElementById('openLetterBtn');
+        const cakeBtn = document.getElementById('showCakeBtn');
+        const modal = document.getElementById('letterModal');
+        const closeModalBtn = document.getElementById('closeLetterBtn');
+        const bgMusic = document.getElementById('bgMusic');
+        
+        // Animation Elements
+        const bunting = document.getElementById('bunting');
+        const textSection = document.getElementById('textSection');
+        const imageSection = document.getElementById('imageSection');
+        const balloons = document.querySelectorAll('.balloon');
+
+        // Cake Overlay Elements
+        const cakeOverlay = document.getElementById('cake-overlay');
+        const finishCakeBtn = document.getElementById('finish-cake-btn');
+
+        // 0. Parse Emojis on Load to Lock Appearance
+        window.onload = function() {
+            twemoji.parse(document.body);
+        }
+
+        // 1. Lights On Interaction
+        turnOnBtn.addEventListener('click', () => {
+            // Play Audio immediately on interaction
+            bgMusic.play().catch(error => console.log("Audio play failed (browser blocked): ", error));
+
+            // Fade out overlay
+            overlay.classList.add('fade-out');
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                mainContent.style.opacity = '1';
+
+                // --- TRIGGER BOUNCY ENTRANCE ANIMATIONS ---
+                
+                // 1. Flags Drop Down
+                bunting.classList.add('animate-down');
+
+                // 2. Text Bounce Down
+                textSection.classList.add('animate-down');
+
+                // 3. Image Bounce Up
+                imageSection.classList.add('animate-up');
+
+                // 4. Balloons Fly Up
+                balloons.forEach(balloon => {
+                    balloon.style.top = balloon.getAttribute('data-top');
+                    
+                    // After entrance (2.5s), make them float
+                    setTimeout(() => {
+                        balloon.classList.add('floating');
+                    }, 2500);
+                });
+
+                createConfetti(20); 
+            }, 500);
+        });
+
+        // 2. Letter Modal Logic
+        letterBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+            mainContent.classList.add('blur-background');
+        });
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            mainContent.classList.remove('blur-background');
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                mainContent.classList.remove('blur-background');
+            }
+        });
+
+        // 3. New Cake Interaction
+        cakeBtn.addEventListener('click', () => {
+            mainContent.classList.add('blur-background');
+            cakeOverlay.style.display = 'flex';
+            createConfetti(100);
+        });
+
+        // 4. Finish Cake Interaction
+        finishCakeBtn.addEventListener('click', () => {
+            cakeOverlay.style.display = 'none';
+            mainContent.classList.remove('blur-background');
+        });
+
+        // 5. Confetti Generator
+        function createConfetti(amount) {
+            const colors = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#ff6b81'];
+            for (let i = 0; i < amount; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = -20 + 'px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                document.body.appendChild(confetti);
+                setTimeout(() => { confetti.remove(); }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
